@@ -6,9 +6,11 @@ const token = process.env.TOKEN
 
 const baseURL = `https://api.teller.io/accounts`
 
-const getData = id => {
+const GetData = id => {
+    let url = id ? `${baseURL}/${id}` : baseURL
+
     return axios
-        .get(() => (id ? `${baseURL}/${id}` : baseURL), {
+        .get(url, {
             headers: { Authorization: `Bearer ${token}` },
         })
         .then(res => {
@@ -17,16 +19,9 @@ const getData = id => {
         .catch(error => console.log(error))
 }
 
-const GetAllData = () => {
-    return axios
-        .get(baseURL, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-        .then(res => {
-            return res.data
-        })
-        .catch(error => console.log(error))
-}
+GetData('0a8f0aa8-14de-44e7-abdd-1c95bad906f5').then(({ links: { transactions } }) =>
+    console.log(transactions)
+)
 
 const typeDefs = gql`
     type Query {
@@ -36,11 +31,11 @@ const typeDefs = gql`
     type Account {
         name: String
         tellerId: String!
-        enrollment_id: String
+        enrollmentId: String
         currency: String
         balance: Float
-        bank_code: String
-        account_number: Int
+        bankCode: String
+        accountNumber: Int
         institution: String
         links: Links
     }
@@ -55,29 +50,54 @@ const typeDefs = gql`
 
 `
 
-const GetDataByID = id => {
-    return axios
-        .get(`${baseURL}/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-        .then(res => {
-            return res.data
-        })
-        .catch(error => console.log(error))
-}
-
 const resolvers = {
     Query: {
-        accounts: () => GetAllData(),
+        accounts: () => GetData(),
     },
     Account: {
         name: parent => {
             const { id } = parent
-            return GetDataByID(id).then(data => data.name)
+            return GetData(id).then(({ name }) => name)
         },
         tellerId: parent => {
             const { id } = parent
-            return GetDataByID(id).then(data => data.id)
+            return GetData(id).then(({ enrollment_id }) => enrollment_id)
+        },
+        enrollmentId: parent => {
+            const { id } = parent
+            return GetData(id).then(({ enrollment_id }) => enrollment_id)
+        },
+        currency: parent => {
+            const { id } = parent
+            return GetData(id).then(({ currency }) => currency)
+        },
+        balance: parent => {
+            const { id } = parent
+            return GetData(id).then(({ balance }) => balance)
+        },
+        bankCode: parent => {
+            const { id } = parent
+            return GetData(id).then(({ bank_code }) => bank_code)
+        },
+        accountNumber: parent => {
+            const { id } = parent
+            return GetData(id).then(({ account_number }) => account_number)
+        },
+        institution: parent => {
+            const { id } = parent
+            return GetData(id).then(({ institution }) => institution)
+        },
+
+        links: parent => {
+            const { id } = parent
+            return GetData(id).then(({ links }) => links)
+        },
+    },
+
+    Links: {
+        transactions: parent => {
+            const { id } = parent
+            return GetData(id).then(({ links: { transactions } }) => transactions)
         },
     },
 }
