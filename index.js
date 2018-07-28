@@ -6,6 +6,28 @@ const token = process.env.TOKEN
 
 const baseURL = `https://api.teller.io/accounts`
 
+const getData = id => {
+    return axios
+        .get(() => (id ? `${baseURL}/${id}` : baseURL), {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+        .then(res => {
+            return res.data
+        })
+        .catch(error => console.log(error))
+}
+
+const GetAllData = () => {
+    return axios
+        .get(baseURL, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+        .then(res => {
+            return res.data
+        })
+        .catch(error => console.log(error))
+}
+
 const typeDefs = gql`
     type Query {
         accounts: [Account!]!
@@ -13,45 +35,49 @@ const typeDefs = gql`
 
     type Account {
         name: String
-        tellerId: String
+        tellerId: String!
+        enrollment_id: String
+        currency: String
+        balance: Float
+        bank_code: String
+        account_number: Int
+        institution: String
+        links: Links
+    }
+
+    type Links {
+        transactions: String
+        standing_orders: String
+        self: String
+        payments: String
+        payee: String
     }
 
 `
 
+const GetDataByID = id => {
+    return axios
+        .get(`${baseURL}/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+        .then(res => {
+            return res.data
+        })
+        .catch(error => console.log(error))
+}
+
 const resolvers = {
     Query: {
-        accounts: () => {
-            return axios
-                .get(baseURL, {
-                    headers: { Authorization: `Bearer ${token}` },
-                })
-                .then(res => {
-                    return res.data
-                })
-        },
+        accounts: () => GetAllData(),
     },
     Account: {
         name: parent => {
             const { id } = parent
-
-            return axios
-                .get(`${baseURL}/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                })
-                .then(res => {
-                    return res.data.name
-                })
+            return GetDataByID(id).then(data => data.name)
         },
         tellerId: parent => {
             const { id } = parent
-
-            return axios
-                .get(`${baseURL}/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                })
-                .then(res => {
-                    return res.data.id
-                })
+            return GetDataByID(id).then(data => data.id)
         },
     },
 }
