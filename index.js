@@ -8,7 +8,7 @@ const baseURL = `https://api.teller.io/accounts`
 
 const typeDefs = gql`
     type Query {
-        account: Account
+        accounts: [Account!]!
     }
 
     type Account {
@@ -20,9 +20,9 @@ const typeDefs = gql`
 
 const resolvers = {
     Query: {
-        account: () => {
+        accounts: () => {
             return axios
-                .get(`${baseURL}/0a8f0aa8-14de-44e7-abdd-1c95bad906f5`, {
+                .get(baseURL, {
                     headers: { Authorization: `Bearer ${token}` },
                 })
                 .then(res => {
@@ -31,18 +31,22 @@ const resolvers = {
         },
     },
     Account: {
-        name: () => {
+        name: parent => {
+            const { id } = parent
+
             return axios
-                .get(`${baseURL}/0a8f0aa8-14de-44e7-abdd-1c95bad906f5`, {
+                .get(`${baseURL}/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 })
                 .then(res => {
                     return res.data.name
                 })
         },
-        tellerId: () => {
+        tellerId: parent => {
+            const { id } = parent
+
             return axios
-                .get(`${baseURL}/0a8f0aa8-14de-44e7-abdd-1c95bad906f5`, {
+                .get(`${baseURL}/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 })
                 .then(res => {
