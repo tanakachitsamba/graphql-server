@@ -13,11 +13,10 @@ const GetData = id => {
 
     return axios
         .get(url, {
+            // auth token required by teller api
             headers: { Authorization: `Bearer ${token}` },
         })
-        .then(res => {
-            return res.data
-        })
+        .then(res => res.data)
         .catch(error => console.log(error))
 }
 
@@ -40,7 +39,7 @@ const typeDefs = gql`
 
     type Links {
         transactions: String
-        standing_orders: String
+        standingOrders: String
         self: String
         payments: String
         payee: String
