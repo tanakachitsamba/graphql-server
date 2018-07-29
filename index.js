@@ -1,11 +1,13 @@
 const { ApolloServer, gql } = require('apollo-server')
 const axios = require('axios')
 
+// the personal token for the teller api
 require('dotenv').load()
 const token = process.env.TOKEN
 
 const baseURL = `https://api.teller.io/accounts`
 
+// fetches data by url
 const GetData = id => {
     let url = id ? `${baseURL}/${id}` : baseURL
 
@@ -18,10 +20,6 @@ const GetData = id => {
         })
         .catch(error => console.log(error))
 }
-
-GetData('0a8f0aa8-14de-44e7-abdd-1c95bad906f5').then(({ links: { transactions } }) =>
-    console.log(transactions)
-)
 
 const typeDefs = gql`
     type Query {
@@ -95,8 +93,8 @@ const resolvers = {
     },
 
     Links: {
-        transactions: parent => {
-            const { id } = parent
+        transactions: (parent, args) => {
+            const { id } = args
             return GetData(id).then(({ links: { transactions } }) => transactions)
         },
     },
