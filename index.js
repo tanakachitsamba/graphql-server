@@ -24,6 +24,11 @@ const GetData = id => {
 const typeDefs = gql`
     type Query {
         accounts: [Account!]!
+        links: Links
+    }
+
+    type Test {
+        name: String
     }
 
     type Account {
@@ -52,51 +57,25 @@ const resolvers = {
     Query: {
         accounts: () => GetData(),
     },
-    Account: {
-        name: parent => {
-            const { id } = parent
-            return GetData(id).then(({ name }) => name)
-        },
-        tellerId: parent => {
-            const { id } = parent
-            return GetData(id).then(({ enrollment_id }) => enrollment_id)
-        },
-        enrollmentId: parent => {
-            const { id } = parent
-            return GetData(id).then(({ enrollment_id }) => enrollment_id)
-        },
-        currency: parent => {
-            const { id } = parent
-            return GetData(id).then(({ currency }) => currency)
-        },
-        balance: parent => {
-            const { id } = parent
-            return GetData(id).then(({ balance }) => balance)
-        },
-        bankCode: parent => {
-            const { id } = parent
-            return GetData(id).then(({ bank_code }) => bank_code)
-        },
-        accountNumber: parent => {
-            const { id } = parent
-            return GetData(id).then(({ account_number }) => account_number)
-        },
-        institution: parent => {
-            const { id } = parent
-            return GetData(id).then(({ institution }) => institution)
-        },
 
-        links: parent => {
-            const { id } = parent
-            return GetData(id).then(({ links }) => links)
-        },
+    Account: {
+        name: ({ id }) => GetData(id).then(({ name }) => name),
+        tellerId: ({ id }) => GetData(id).then(({ enrollment_id }) => enrollment_id),
+        enrollmentId: ({ id }) => GetData(id).then(({ enrollment_id }) => enrollment_id),
+        currency: ({ id }) => GetData(id).then(({ currency }) => currency),
+        balance: ({ id }) => GetData(id).then(({ balance }) => balance),
+        bankCode: ({ id }) => GetData(id).then(({ bank_code }) => bank_code),
+        accountNumber: ({ id }) => GetData(id).then(({ account_number }) => account_number),
+        institution: ({ id }) => GetData(id).then(({ institution }) => institution),
+        links: ({ id }) => GetData(id).then(({ links }) => links),
     },
 
     Links: {
-        transactions: (parent, args) => {
-            const { id } = args
-            return GetData(id).then(({ links: { transactions } }) => transactions)
-        },
+        transactions: ({ transactions }) => transactions,
+        standingOrders: ({ standing_orders }) => standing_orders,
+        self: ({ self }) => self,
+        payments: ({ payments }) => payments,
+        payee: ({ payee }) => payee,
     },
 }
 
