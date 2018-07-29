@@ -24,11 +24,6 @@ const GetData = id => {
 const typeDefs = gql`
     type Query {
         accounts: [Account!]!
-        links: Links
-    }
-
-    type Test {
-        name: String
     }
 
     type Account {
