@@ -7,24 +7,9 @@ const token = process.env.TOKEN
 
 const baseURL = `https://api.teller.io/accounts`
 
-// fetches data by url
-const getData = id => {
-    let url = id ? `${baseURL}/${id}` : baseURL
-
-    return axios
-        .get(url, {
-            // auth token required by teller api
-            headers: { Authorization: `Bearer ${token}` },
-        })
-        .then(res => {
-            console.log(res.data)
-            return res.data
-        })
-        .catch(error => console.log(error))
-}
-
+// fetch teller data
 const getDataByUrl = (route, id) => {
-    let url = route ? `${baseURL}/${id}/${route}` : baseURL
+    let url = route ? `${baseURL}/${id}/${route}` : id ? `${baseURL}/${id}` : baseURL
     return axios
         .get(url, {
             // auth token required by teller api
@@ -90,7 +75,7 @@ const typeDefs = gql`
 const resolvers = {
     Query: {
         accounts: () => getDataByUrl(),
-        account: (parent, { id }) => getData(id),
+        account: (parent, { id }) => getDataByUrl(null, id),
         transactions: (parent, { id }) => getDataByUrl('transactions', id),
         payees: (parent, { id }) => getDataByUrl('payees', id),
     },
