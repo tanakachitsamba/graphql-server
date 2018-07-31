@@ -8,15 +8,32 @@ const token = process.env.TOKEN
 const baseURL = `https://api.teller.io/accounts`
 
 // fetches data by url
-const getData = id => {
-    let url = id ? `${baseURL}/${id}` : baseURL
+const getData = ({ id }) => {
+    let url = !id ? baseURL : `${baseURL}/${id}`
 
     return axios
         .get(url, {
             // auth token required by teller api
             headers: { Authorization: `Bearer ${token}` },
         })
-        .then(res => res.data)
+        .then(res => {
+            console.log(res.data)
+            return res.data
+        })
+        .catch(error => console.log(error))
+}
+
+const getDataByUrl = ({ route, id }) => {
+    let url = `${baseURL}/${id}/${route}`
+    return axios
+        .get(url, {
+            // auth token required by teller api
+            headers: { Authorization: `Bearer ${token}` },
+        })
+        .then(res => {
+            //console.log(res.data)
+            return res.data
+        })
         .catch(error => console.log(error))
 }
 
@@ -24,6 +41,7 @@ const typeDefs = gql`
     type Query {
         accounts: [Account!]!
         account(id: ID!): Account
+        transactions(id: ID!): [Transactions!]!
     }
 
     type Account {
@@ -46,12 +64,24 @@ const typeDefs = gql`
         payee: String
     }
 
+    type Transactions {
+        type: String
+        id: ID!
+        running_balance: Float
+        links: Links
+        description: String
+        date: String
+        counterparty: String
+        amount: Float
+    }
+
 `
 
 const resolvers = {
     Query: {
         accounts: () => getData(),
-        account: (parent, { id }) => getData(id),
+        account: (parent, { id }) => getData({ id }),
+        transactions: (parent, { id }) => getDataByUrl({ route: 'transactions', id }),
     },
 }
 
