@@ -3,20 +3,19 @@ const axios = require('axios')
 
 // the personal token for the teller api
 require('dotenv').load()
-const token = process.env.TOKEN
+const secretToken = process.env.SECRET_TOKEN
 
 const baseURL = `https://api.teller.io/accounts`
 
 // fetch teller data
-const getDataByUrl = (route, id) => {
+const getData = (route, id) => {
     let url = route ? `${baseURL}/${id}/${route}` : id ? `${baseURL}/${id}` : baseURL
     return axios
         .get(url, {
             // auth token required by teller api
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${secretToken}` },
         })
         .then(res => {
-            console.log(res.data)
             return res.data
         })
         .catch(error => console.log(error))
@@ -74,10 +73,10 @@ const typeDefs = gql`
 
 const resolvers = {
     Query: {
-        accounts: () => getDataByUrl(),
-        account: (parent, { id }) => getDataByUrl(null, id),
-        transactions: (parent, { id }) => getDataByUrl('transactions', id),
-        payees: (parent, { id }) => getDataByUrl('payees', id),
+        accounts: () => getData(),
+        account: (parent, { id }) => getData(null, id),
+        transactions: (parent, { id }) => getData('transactions', id),
+        payees: (parent, { id }) => getData('payees', id),
     },
 }
 
